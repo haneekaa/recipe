@@ -1,0 +1,111 @@
+import mysql.connector
+mydb = mysql.connector.connect(host=”localhost”, user=”root”,passwd=”student”)
+mycursor =mydb.cursor()
+mycursor.execute(“create database recipe”)
+
+mydb = mysql.connector.connect(host=”localhost”, user=”root”,  passwd=”student”, database=”recipe”)
+mycursor =mydb.cursor()
+mycursor.execute(“create table recipes (itemno int primary key, rname varchar(20), ing text , prtime int, instr text”) 
+
+def insert():
+    Itemno = int(input(‘enter item number- ‘))
+    rname  = input(‘enter recipe name - ‘)
+    ing  = input(‘enter ingredients - ‘)
+    prtime= int(input(‘enter time taken to make (minutes)- ‘))
+    instr=input(‘enter the instructions- ‘)
+    
+    query =”insert into recipes values({0},{1},{2},{3},{4})”.format(itemno,rname,ing,prtime,instr)
+    mycursor.execute(query) 
+    mydb.commit()
+    print(‘record added’)
+
+
+def view():
+     mycursor.execute(‘select * from recipes’)
+     res=mycursor.fetchall()
+     print(‘recipes- ‘)
+     for i in res:
+           print(i)
+
+def search():
+    name = input(“enter recipe name to search”)
+    query = “select * from recipes where rname=”+name
+    mycursor.execute(query)
+    res=mycursor.fetchone()
+    count = mycursor.rowcount
+    if count ==0 or res is None:
+        print(“record not found :( ”)
+    else: 
+        print(“record found”)
+        print(“recipe name:”,res[1])
+        print(“ingredients:”,res[2])
+        print(“preparation time:”,res[3])
+        print(“instructions:”,res[4])
+   
+def delete():
+    name = input(“enter recipe name to delete”)
+    query = “delete from recipes where rname=”+name
+    mycursor.execute(query)
+    mydb.commit()
+
+def edit():
+    name = input(“enter recipe name ”)
+    query = “select * from recipes where rname=”+name
+    mycursor.execute(query)
+    res=mycursor.fetchone()
+    count = mycursor.rowcount
+    if count ==0 or res is None:
+        print(“record not found :( ”)
+    else: 
+        print(res)
+        choice= input(“what do you want to edit? (ingredients/prep time/instructions):”)
+        if choice==”ingredients”:
+            new = input(“enter updated ingredients:”)
+            q= “update recipes set ing=%s where rname=%s”
+        elif choice==”prep time”:
+            new = input(“enter updated prep time:”)
+            q= “update recipes set prtime=%s where rname=%s”
+        elif choice==”instructions”:
+            new = input(“enter updated instructions:”)
+            q= “update recipes set instr=%s where rname=%s”
+        mycursor.execute(q,(new,name))
+        mydb.commit()
+        print(‘recipe updated’)
+
+print(“welcome to your digital cookbook!”)
+print(“~~~~~~~~~~~~~~~~~~~~~~~~~”)
+print()
+a =0
+while a==0:
+    print(“--------------MAIN MENU—-----------”)
+    print(“1. add a new recipe”)
+    print(“2. search for a recipe”)
+    print(“3. delete a recipe”)
+    print(“4. edit recipe”)
+    print(“5. show all recipes”)
+    print(“6. exit “)
+    print(“-------------------------------—-----------”)
+    print()
+    ch = int(input(“choose operation (1-6): “))
+    If ch==1:
+        insert()
+    elif ch==2:
+        search()
+    elif ch==3:
+        delete()
+    elif ch==4:
+        edit()
+    elif ch==5:
+        view()
+    elif ch==6:
+        a=1
+    else:
+        print(“invalid choice”)
+
+
+mycursor.close()
+mydb.close()
+
+    
+    
+      
